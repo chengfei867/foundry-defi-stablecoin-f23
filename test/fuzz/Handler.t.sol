@@ -24,7 +24,9 @@ contract Handler is Test {
         dsc = _dsc;
         weth = ERC20Mock(dsce.getCollateralTokens()[0]);
         wbtc = ERC20Mock(dsce.getCollateralTokens()[1]);
-        ethUsdPriceFeed = MockV3Aggregator(dsce.getCollateralTokenPriceFeed(address(weth)));
+        ethUsdPriceFeed = MockV3Aggregator(
+            dsce.getCollateralTokenPriceFeed(address(weth))
+        );
     }
 
     /**
@@ -47,19 +49,22 @@ contract Handler is Test {
         usersWithCollateralDeposited.push(msg.sender);
     }
 
-    function mintDsc(uint256 amount,uint256 addressSeed) public {
-        if(usersWithCollateralDeposited.length == 0){
+    function mintDsc(uint256 amount, uint256 addressSeed) public {
+        if (usersWithCollateralDeposited.length == 0) {
             return;
         }
-        address sender = usersWithCollateralDeposited[addressSeed%usersWithCollateralDeposited.length];
+        address sender = usersWithCollateralDeposited[
+            addressSeed % usersWithCollateralDeposited.length
+        ];
         (uint256 totalDscMinted, uint256 collateralValueInUsd) = dsce
             .getAccountInformation(sender);
-        int256 maxDscToMint = ((int256 (collateralValueInUsd)/2) - int256(totalDscMinted));
-        if(maxDscToMint <= 0){
+        int256 maxDscToMint = ((int256(collateralValueInUsd) / 2) -
+            int256(totalDscMinted));
+        if (maxDscToMint <= 0) {
             return;
         }
-        amount = bound(amount,0,uint256(maxDscToMint));
-        if(amount == 0){
+        amount = bound(amount, 0, uint256(maxDscToMint));
+        if (amount == 0) {
             return;
         }
         vm.startPrank(sender);
@@ -79,8 +84,8 @@ contract Handler is Test {
     ) public {
         ERC20Mock collateral = _getCollateralFromSeed(collateralSeed);
         uint256 maxCollateralToRedeem = dsce.getCollateralBalanceOfUser(
-            address(collateral),
-            msg.sender
+            msg.sender,
+            address(collateral)
         );
         amountCollateral = bound(amountCollateral, 0, maxCollateralToRedeem);
         if (maxCollateralToRedeem == 0) {
